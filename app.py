@@ -14,11 +14,19 @@ df2 = pd.read_csv("IPL_Matches_2008_2022.csv")
 #st.sidebar.title("   IPL Data Analysis")
 
 hide_st_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            </style>
-            """
+<style>
+/* Hide everything */
+body {
+    display: none !important;
+}
+
+/* Show header */
+header {
+    display: block !important;
+}
+</style>
+"""
+
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 st.sidebar.markdown(
