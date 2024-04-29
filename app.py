@@ -13,15 +13,13 @@ df2 = pd.read_csv("IPL_Matches_2008_2022.csv")
 #st.sidebar.title("This is IPL Analysis Project.")
 #st.sidebar.title("   IPL Data Analysis")
 
-hide_main_menu_style = """
-<style>
-#MainMenu .menu-item {
-    display: none !important;
-}
-</style>
-"""
-
-st.markdown(hide_main_menu_style, unsafe_allow_html=True)
+hide_st_style = """
+            <style>
+            #stActionButtonIcon {visibility: hidden;}
+            
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
 
 st.sidebar.markdown(
     '<div style="text-align: center; font-size: 35px; font-weight: bold;">IPL DATA ANALYSIS</div>',
