@@ -15,7 +15,7 @@ df2 = pd.read_csv("IPL_Matches_2008_2022.csv")
 
 hide_st_style = """
             <style>
-            #root {visibility: hidden;}
+            #st-emotion-cache-q16mip e3g6aar1 {visibility: hidden;}
             
             </style>
             """
