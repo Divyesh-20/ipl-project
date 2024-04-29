@@ -16,7 +16,8 @@ df2 = pd.read_csv("IPL_Matches_2008_2022.csv")
 hide_st_style = """
             <style>
             
-            header {visibility: hidden;}
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
