@@ -35,7 +35,7 @@ with st.sidebar:
     url1 = "https://github.com/ajstyle007"
     text1 = "Github" 
 
-    url2 = "https://medium.com/p/c38b78239e4f/edit"
+    url2 = "https://medium.com/@kumarajaypaonta/exploratory-data-analysis-of-ipl-dataset-2008-2022-c38b78239e4f"
     text2 = "Blog Post" 
 
     url3 = "https://www.linkedin.com/in/ajay-kumar-72ba861b8/"
