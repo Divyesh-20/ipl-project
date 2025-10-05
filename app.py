@@ -7,8 +7,8 @@ import plotly.figure_factory as ff
 import streamlit as st
 import functions
 
-df1 = pd.read_csv("IPL_Ball_by_Ball_2008_2022.csv")
-df2 = pd.read_csv("IPL_Matches_2008_2022.csv")
+df1 = pd.read_csv("IPL_Ball_by_Ball_2008_2025 - Copy.csv")
+df2 = pd.read_csv("IPL_Matches_2008_2025.csv")
 
 #st.sidebar.title("This is IPL Analysis Project.")
 #st.sidebar.title("   IPL Data Analysis")
@@ -29,102 +29,88 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-with st.sidebar:
-    col1, col2, col3 = st.columns(3)
+# with st.sidebar:
+#     col1, col2, col3 = st.columns(3)
 
-    url1 = "https://github.com/ajstyle007"
-    text1 = "Github" 
+#     url1 = "https://github.com/ajstyle007"
+#     text1 = "Github" 
 
-    url2 = "https://medium.com/@kumarajaypaonta/exploratory-data-analysis-of-ipl-dataset-2008-2022-c38b78239e4f"
-    text2 = "Blog Post" 
+#     url2 = "https://medium.com/@kumarajaypaonta/exploratory-data-analysis-of-ipl-dataset-2008-2025-c38b78239e4f"
+#     text2 = "Blog Post" 
 
-    url3 = "https://www.linkedin.com/in/ajay-kumar-72ba861b8/"
-    text3 = "Linkedin"
+#     url3 = "https://www.linkedin.com/in/ajay-kumar-72ba861b8/"
+#     text3 = "Linkedin"
 
-    col1.link_button(text1, url1)
-    col2.link_button(text2, url2)
-    col3.link_button(text3, url3)
+#     col1.link_button(text1, url1)
+#     col2.link_button(text2, url2)
+#     col3.link_button(text3, url3)
 
 st.sidebar.image("ipl.jpg", width = 220)
 #st.table(df1.head())
 user_menu = st.sidebar.radio("Select an option", ("Overview", "Player Statistics", "Team wise Analysis", "Players wise Analysis", "miscellaneous analysis"))
 
+
 if user_menu == "Overview":
-    #st.markdown("<center><font size='6'><b>IPL Exploratory Data Analysis</b></font></center>", unsafe_allow_html=True)
-    col1, col2, col3, col4,col5, col6 = st.columns([5,1,1,2,3,3])
+    # Layout: 6 columns with flexible widths
+    col1, _, _, _, col5, col6 = st.columns([5, 1, 1, 2, 3, 3])
+
+    # Left side: IPL image with a title above
     with col1:
-        st.image("IPL_new.png", width=400)
+        st.markdown("<h1 style='text-align: center; color: #1DB954;'>IPL Exploratory Data Analysis</h1>", unsafe_allow_html=True)
+        st.image("IPL 2020.jpg", width=400, caption="IPL 2025 Season")
 
-    with col4:
-        st.markdown("### :cricket_bat_and_ball:")
-        st.markdown("### :softball:")
-        st.markdown("### :cricket_bat_and_ball:")
-        st.markdown("### :softball:")
-        st.markdown("### :cricket_bat_and_ball:")
-        st.markdown("### :softball:")
-        st.markdown("### :cricket_bat_and_ball:")
-        st.markdown("### :softball:")
+    # Merge the datasets once and reuse
+    merged_df = pd.merge(df1, df2, how='inner', on='ID')
+
+    # Col5: Key aggregated metrics
     with col5:
-        season = df2["Season"].nunique()
-        st.markdown("##### :green[Seasons] :sports_medal:")
-        st.header(season)
+        seasons = df2["Season"].nunique()
+        st.metric(label="Seasons", value=seasons)
 
-        total_wick = df1[df1["isWicketDelivery"] == 1]["bowler"].value_counts().sum()
-        st.markdown("##### :green[Wickets] :cricket:")
-        st.header(total_wick)
+        total_wickets = df1[df1["isWicketDelivery"] == 1].shape[0]
+        st.metric(label="Wickets", value=total_wickets)
 
-        sixes = df1[df1["batsman_run"] == 6]["batsman_run"].count()
-        st.markdown("##### :green[Total 6s] :six:")
-        st.header(sixes)
+        sixes = df1[df1["batsman_run"] == 6].shape[0]
+        st.metric(label="Total Sixes", value=sixes)
 
-        merd_df = pd.merge(df1, df2, how='inner', on='ID')
-        hunderds = merd_df.groupby(["ID", "batter"])["batsman_run"].sum().reset_index()
-        hun_100 = hunderds[hunderds["batsman_run"] >= 100]["batsman_run"].count()
-        st.markdown("##### :green[Total 100s] :100:")
-        st.header(hun_100)
-    
+        # # Total centuries (100s)
+        # centuries_df = merged_df.groupby(["ID", "batter"])["batsman_run"].sum().reset_index()
+        # total_centuries = centuries_df[centuries_df["batsman_run"] >= 100].shape[0]
+        # st.metric(label="Total Centuries (100+ runs)", value=total_centuries)
+
+    # Col6: More key metrics + Top 10 batsmen runs
     with col6:
-        b_run = df1[df1["batsman_run"] >= 1]
-        top_10_bats = b_run.groupby("batter")["batsman_run"].sum().sum()
-        st.markdown("##### :green[Runs] :cricket_bat_and_ball:")
-        st.header(top_10_bats)
+        total_runs = df1["batsman_run"].sum()
+        st.metric(label="Total Runs", value=total_runs)
 
         total_balls = df1.shape[0]
-        st.markdown("##### :green[Balls] :softball:")
-        st.header(total_balls)
+        st.metric(label="Total Balls Bowled", value=total_balls)
 
-        fours = df1[df1["batsman_run"] == 4]["batsman_run"].count()
-        st.markdown("##### :green[Total 4s] :four:")
-        st.header(fours)
+        fours = df1[df1["batsman_run"] == 4].shape[0]
+        st.metric(label="Total Fours", value=fours)
 
-        merd_df = pd.merge(df1, df2, how='inner', on='ID')
-        fift = merd_df.groupby(["ID", "batter"])["batsman_run"].sum().reset_index()
-        hun_50 = fift[(fift["batsman_run"] >= 50) & (fift["batsman_run"] <100)]["batsman_run"].count()
-        st.markdown("##### :green[Total 50s] :five::zero:")
-        st.header(hun_50)
+        # half_centuries_df = centuries_df[(centuries_df["batsman_run"] >= 50) & (centuries_df["batsman_run"] < 100)]
+        # total_half_centuries = half_centuries_df.shape[0]
+        # st.metric(label="Total Half-Centuries (50-99 runs)", value=total_half_centuries)
 
-    
-    #     st.markdown("<div style='border-left: 2px solid #FFF; height: 100px;'></div>", unsafe_allow_html=True)
-    expander = st.expander("About")
-    with expander:
-        st.write("""This is a homepage of the web app serves as an overview dashboard, 
-            showcasing key metrics summarizing the IPL dataset. Here, 
-            users can immediately grasp important statistics such as the total runs scored, 
-            total balls bowled, total wickets taken, number of seasons played,
-            the total number of sixes and fours hit, as well as the count of 
-            centuries and half-centuries scored throughout IPL history.""")
-                 
-        st.write("""Additionally, a sidebar is prominently featured with 
-            five radio buttons labeled "Overview," "Player Statistics," 
-            "Player-Wise Analysis," "Team-Wise Analysis," and 
-            "Miscellaneous Analysis." These radio buttons act as navigation tools, 
-            enabling users to delve deeper into specific aspects of IPL data analysis.
-            Clicking on any of these buttons directs users to dedicated sections 
-            within the web app, where they can explore detailed visualizations 
-            and in-depth analysis tailored to their chosen category of interest. 
-            This intuitive design facilitates seamless exploration and enhances 
-            user experience, allowing cricket enthusiasts to uncover insights and 
-            trends within the rich landscape of IPL data.""")
+        # Top 10 batsmen by runs
+        runs_by_batsman = df1.groupby("batter")["batsman_run"].sum().sort_values(ascending=False).head(10)
+        st.markdown("### 🏏 Top 10 Batsmen by Runs")
+        st.bar_chart(runs_by_batsman)
+
+    # # Add an info expander about the app
+    # with st.expander("About this overview"):
+    #     st.write("""
+    #     This dashboard provides a quick summary of IPL data, including:
+    #     - Number of seasons played
+    #     - Total wickets, sixes, and fours hit
+    #     - Centuries and half-centuries scored
+    #     - Total runs and balls bowled
+    #     - Top 10 batsmen by runs
+
+    #     Use the sidebar to navigate to detailed player and team analyses.
+    #     """)
+
 
 if user_menu == "Player Statistics":
     #st.title("Player Statistics")
@@ -264,15 +250,15 @@ if user_menu == "Player Statistics":
         st.table(player_out_df)
     
 
-    expander1 = st.expander("See Explanation")
-    with expander1:
-        st.write("""Above is a simple function using the IPL dataset 
-                 that retrieves all the basic information about an IPL player. 
-                 This function allows users to input the 
-                 player's name and receive essential details such as their team, 
-                 batting and bowling averages, strike rates, and other relevant stats. 
-                 It's a convenient tool for quickly accessing key information about any 
-                 IPL player from the dataset.""")
+    # expander1 = st.expander("See Explanation")
+    # with expander1:
+    #     st.write("""Above is a simple function using the IPL dataset 
+    #              that retrieves all the basic information about an IPL player. 
+    #              This function allows users to input the 
+    #              player's name and receive essential details such as their team, 
+    #              batting and bowling averages, strike rates, and other relevant stats. 
+    #              It's a convenient tool for quickly accessing key information about any 
+    #              IPL player from the dataset.""")
 
 
 if user_menu == "Team wise Analysis":
@@ -453,29 +439,29 @@ if user_menu == "Team wise Analysis":
         fig.update_layout(width=1000, height=800)
         st.plotly_chart(fig)
 
-    expander2 = st.expander("See Explanation")
-    with expander2:
-        st.write("""In the "Team-Wise Analysis" section, users can explore IPL team performance 
-                 through two tabs: "Analysis 1" and "Analysis 2." 
-                 These tabs offer distinct insights into various metrics and trends, 
-                 enabling users to gain a comprehensive understanding of team dynamics.Like""")
-        message = """* Total Runs by IPL Teams 
-                 * Total Finals Wins by the teams
-                 * Total Matches win by the Teams
-                 * Total Matches played by each team
-                 * Total teams participating over the years
-                 * Most Finals played by the teams
-                 * Win Toss-Win Match Analysis
-                 * Most Finals played by the Teams
-                 * Number of Matches hosted in different cities
-                 * Win percentage as batting team and bowling team 
-                 * Matches played vs Matches Won by the teams
-                 * Win Margin of teams Won by runs and by Wickets"""
-        lines = message.split("\n")
+    # expander2 = st.expander("See Explanation")
+    # with expander2:
+    #     st.write("""In the "Team-Wise Analysis" section, users can explore IPL team performance 
+    #              through two tabs: "Analysis 1" and "Analysis 2." 
+    #              These tabs offer distinct insights into various metrics and trends, 
+    #              enabling users to gain a comprehensive understanding of team dynamics.Like""")
+    #     message = """* Total Runs by IPL Teams 
+    #              * Total Finals Wins by the teams
+    #              * Total Matches win by the Teams
+    #              * Total Matches played by each team
+    #              * Total teams participating over the years
+    #              * Most Finals played by the teams
+    #              * Win Toss-Win Match Analysis
+    #              * Most Finals played by the Teams
+    #              * Number of Matches hosted in different cities
+    #              * Win percentage as batting team and bowling team 
+    #              * Matches played vs Matches Won by the teams
+    #              * Win Margin of teams Won by runs and by Wickets"""
+    #     lines = message.split("\n")
 
-        # Print each line in the list
-        for line in lines:
-            st.write(line)
+        # # Print each line in the list
+        # for line in lines:
+        #     st.write(line)
 
 if user_menu == "Players wise Analysis":
 
@@ -488,7 +474,7 @@ if user_menu == "Players wise Analysis":
 
         fig = px.bar(orange_cap, x='batter', y='Season_run',text_auto = True)
         fig.update_xaxes(tickangle=45)
-        fig.update_layout(title = "Orange Cap Holders 2008-2022",title_x=0.4,title_y=1, width=850, height=430)
+        fig.update_layout(title = "Orange Cap Holders 2008-2025",title_x=0.4,title_y=1, width=850, height=430)
         fig.update_traces(marker_color = 'orange', marker_line_color = 'black',marker_line_width = 2, opacity = 1)
         st.plotly_chart(fig)
 
@@ -501,7 +487,7 @@ if user_menu == "Players wise Analysis":
 
         fig = px.bar(purple_cap, x='bowler', y='Season_wickets', text_auto=True)
         fig.update_xaxes(tickangle=45)
-        fig.update_layout(title = "Purple Cap Holders 2008-2022",title_x=0.4,title_y=1, width=900, height=400)
+        fig.update_layout(title = "Purple Cap Holders 2008-2025",title_x=0.4,title_y=1, width=900, height=400)
         fig.update_traces(marker_color = 'purple', marker_line_color = 'black',marker_line_width = 2, opacity = 1)
         st.plotly_chart(fig)
     
@@ -510,7 +496,7 @@ if user_menu == "Players wise Analysis":
         total_hun = functions.top_10_hunderds(df1, df2)
         fig = px.bar(total_hun, x='count', y='batter', orientation="h", text_auto=True)
         fig.update_xaxes(tickangle=45)
-        fig.update_layout(title = "Most 100s by a Batsman 2008-2022",title_x=0.4,title_y=1, width=900, height=400)
+        fig.update_layout(title = "Most 100s by a Batsman 2008-2025",title_x=0.4,title_y=1, width=900, height=400)
         fig.update_traces(marker_color = total_hun["count"], marker_line_color = 'black',marker_line_width = 2, opacity = 1)
         st.plotly_chart(fig)
 
@@ -519,7 +505,7 @@ if user_menu == "Players wise Analysis":
         most_6 = functions.most_sixes(df1)
         fig = px.funnel(most_6, x = "batter", y='count')
         fig.update_xaxes(tickangle=45)
-        fig.update_layout(title = "Most 6s by a Batsman 2008-2022",title_x=0.4,title_y=1, width=900, height=400)
+        fig.update_layout(title = "Most 6s by a Batsman 2008-2025",title_x=0.4,title_y=1, width=900, height=400)
         fig.update_traces(marker_color = 'cyan', marker_line_color = 'black',marker_line_width = 2, opacity = 1)
         st.plotly_chart(fig)
 
@@ -560,7 +546,7 @@ if user_menu == "Players wise Analysis":
                 x=wick['bowler'][i],
                 y=value,
                 text=str(value), showarrow=False, bgcolor="black")
-        fig.update_layout(title = "Top 10 wicket takers in IPL 2008-2022",title_x=0.35,title_y=1, width=900, height=400)
+        fig.update_layout(title = "Top 10 wicket takers in IPL 2008-2025",title_x=0.35,title_y=1, width=900, height=400)
         fig.update_traces(marker_color = 'green')
         st.plotly_chart(fig)
 
@@ -626,54 +612,54 @@ if user_menu == "Players wise Analysis":
         fig.update_layout(title="Type of Outs in IPL",title_x=0.5,width=700,height=400)
         st.plotly_chart(fig)
 
-    expander3 = st.expander("See Explanation")
-    with expander3:
-        st.write("""Discover deeper insights within the "Player-Wise Analysis" section through two 
-                 specialized tabs: "Analysis 1" and "Analysis 2." These tabs offer tailored avenues 
-                 for users to explore diverse dimensions of player performance, statistics,
-                   and trends within the IPL dataset. Whether examining batting averages,
-                     bowling figures, or player contributions across seasons, each tab provides 
-                     a focused platform to analyze and interpret player-centric data effectively.
-                 Insights >>""")
-        message = """* Orange Cap Holders
-                    * Purple Cap Holders
-                    * Most 6s by a Batsman in IPL (2008–2022)
-                    * Top 10 Batsman by Runs
-                    * Type of Dismissals in IPL
-                    * Most 100s by a Batsman
-                    * Most Catches By a Player
-                    * Top 10 Wickets Takers in IPL
-                    * Maximum Balls faced by a Batsman
-                    * Batsman runs and strike rate in death overs
-                    * Bowling Average of Bowlers (top 10)
-                    * Batting Average of Batsmen (top 10)"""
-        lines = message.split("\n")
-        for i in lines:
-            st.write(i)
+    # expander3 = st.expander("See Explanation")
+    # with expander3:
+    #     st.write("""Discover deeper insights within the "Player-Wise Analysis" section through two 
+    #              specialized tabs: "Analysis 1" and "Analysis 2." These tabs offer tailored avenues 
+    #              for users to explore diverse dimensions of player performance, statistics,
+    #                and trends within the IPL dataset. Whether examining batting averages,
+    #                  bowling figures, or player contributions across seasons, each tab provides 
+    #                  a focused platform to analyze and interpret player-centric data effectively.
+    #              Insights >>""")
+    #     message = """* Orange Cap Holders
+    #                 * Purple Cap Holders
+    #                 * Most 6s by a Batsman in IPL (2008–2022)
+    #                 * Top 10 Batsman by Runs
+    #                 * Type of Dismissals in IPL
+    #                 * Most 100s by a Batsman
+    #                 * Most Catches By a Player
+    #                 * Top 10 Wickets Takers in IPL
+    #                 * Maximum Balls faced by a Batsman
+    #                 * Batsman runs and strike rate in death overs
+    #                 * Bowling Average of Bowlers (top 10)
+    #                 * Batting Average of Batsmen (top 10)"""
+        # lines = message.split("\n")
+        # for i in lines:
+        #     st.write(i)
     
 
 if user_menu == "miscellaneous analysis":
 
-    tab1, tab2, tab3 = st.tabs(["Analysis 1", "Analysis 2", "Analysis 3"])
+    tab1, tab3 = st.tabs(["Analysis 1", "Analysis 2"])
     
     with tab1:
 
-        umpire = functions.top_umpires(df1, df2)
-        fig = px.pie(umpire, values='count', names='umpire_name', hole=.4, color_discrete_sequence=px.colors.sequential.Viridis)
-        fig.update_traces(textinfo='value')
-        fig.update_layout(title="Most matches as an umpire",title_x=0.5,width=700,height=400)
-        st.plotly_chart(fig)
+        # umpire = functions.top_umpires(df1, df2)
+        # fig = px.pie(umpire, values='count', names='umpire_name', hole=.4, color_discrete_sequence=px.colors.sequential.Viridis)
+        # fig.update_traces(textinfo='value')
+        # fig.update_layout(title="Most matches as an umpire",title_x=0.5,width=700,height=400)
+        # st.plotly_chart(fig)
 
-        st.markdown("****")
+        # st.markdown("****")
 
-        total_fif = functions.top_10_fifities(df1, df2)
-        fig = px.funnel(total_fif, x="batter", y='count')
-        fig.update_xaxes(tickangle=45)
-        fig.update_layout(title = "Most 50s by a Batsman 2008-2022",title_x=0.4,title_y=1, width=900, height=400)
-        fig.update_traces(marker_color = "yellow", marker_line_color = 'black',marker_line_width = 2, opacity = 1)
-        st.plotly_chart(fig)
+        # total_fif = functions.top_10_fifities(df1, df2)
+        # fig = px.funnel(total_fif, x="batter", y='count')
+        # fig.update_xaxes(tickangle=45)
+        # fig.update_layout(title = "Most 50s by a Batsman 2008-2025",title_x=0.4,title_y=1, width=900, height=400)
+        # fig.update_traces(marker_color = "yellow", marker_line_color = 'black',marker_line_width = 2, opacity = 1)
+        # st.plotly_chart(fig)
 
-        st.markdown("****")
+        # st.markdown("****")
 
         most_4 = functions.most_fours(df1)
         fig = px.scatter(most_4, x = "batter", y='count', size="count", size_max=60, color=most_4["count"])
@@ -683,86 +669,73 @@ if user_menu == "miscellaneous analysis":
                 x=most_4['batter'][i],
                 y=value,
                 text=str(value), showarrow=False, bgcolor="black")
-        fig.update_layout(title = "Most 4s by a Batsman 2008-2022",title_x=0.4,title_y=1, width=900, height=400)
+        fig.update_layout(title = "Most 4s by a Batsman 2008-2025",title_x=0.4,title_y=1, width=900, height=400)
         fig.update_traces(marker_color = most_4["count"], marker_line_color = 'black',marker_line_width = 2, opacity = 1)
         st.plotly_chart(fig)
 
 
         st.markdown("****")
 
-        five_wick = functions.five_wick(df1, df2)
-        fig = px.funnel(five_wick, x ="bowler", y = "count")
-        fig.update_xaxes(tickangle=45)
-        fig.update_layout(title = "5 Wicket bowlers 2008-2022",title_x=0.4,title_y=1, width=900, height=400)
-        fig.update_traces(marker_color = "brown", marker_line_color = 'black',marker_line_width = 2, opacity = 1)
-        st.plotly_chart(fig)
+        # five_wick = functions.five_wick(df1, df2)
+        # fig = px.funnel(five_wick, x ="bowler", y = "count")
+        # fig.update_xaxes(tickangle=45)
+        # fig.update_layout(title = "5 Wicket bowlers 2008-2025",title_x=0.4,title_y=1, width=900, height=400)
+        # fig.update_traces(marker_color = "brown", marker_line_color = 'black',marker_line_width = 2, opacity = 1)
+        # st.plotly_chart(fig)
 
         
     
-    with tab2:
-        col1, col2, col3, col4, col5, col6, col7 = st.columns(7)  
-        with col1:
-            sixes = df1[df1["batsman_run"] == 6]["batsman_run"].count()
-            st.markdown("##### :green[Total 6s]")
-            st.header(sixes)
-        with col2:
-            st.markdown("<div style='border-left: 2px solid #FFF; height: 100px;'></div>", unsafe_allow_html=True)
+    # with tab2:
+    #     col1, col2, col3, col4, col5, col6, col7 = st.columns(7)  
+    #     with col1:
+    #         sixes = df1[df1["batsman_run"] == 6]["batsman_run"].count()
+    #         st.markdown("##### :green[Total 6s]")
+    #         st.header(sixes)
+    #     with col2:
+    #         st.markdown("<div style='border-left: 2px solid #FFF; height: 100px;'></div>", unsafe_allow_html=True)
         
         
-        with col3:
-            fours = df1[df1["batsman_run"] == 4]["batsman_run"].count()
-            st.markdown("##### :green[Total 4s]")
-            st.header(fours)
-        with col4:
-            st.markdown("<div style='border-left: 2px solid #FFF; height: 100px;'></div>", unsafe_allow_html=True)
+    #     with col3:
+    #         fours = df1[df1["batsman_run"] == 4]["batsman_run"].count()
+    #         st.markdown("##### :green[Total 4s]")
+    #         st.header(fours)
+    #     with col4:
+    #         st.markdown("<div style='border-left: 2px solid #FFF; height: 100px;'></div>", unsafe_allow_html=True)
 
-        with col5:
-            merd_df = pd.merge(df1, df2, how='inner', on='ID')
-            hunderds = merd_df.groupby(["ID", "batter"])["batsman_run"].sum().reset_index()
-            hun_100 = hunderds[hunderds["batsman_run"] >= 100]["batsman_run"].count()
-            st.markdown("##### :green[Total 100s]")
-            st.header(hun_100)
-        with col6:
-            st.markdown("<div style='border-left: 2px solid #FFF; height: 100px;'></div>", unsafe_allow_html=True)
-
-        with col7:
-            merd_df = pd.merge(df1, df2, how='inner', on='ID')
-            fift = merd_df.groupby(["ID", "batter"])["batsman_run"].sum().reset_index()
-            hun_50 = fift[(fift["batsman_run"] >= 50) & (fift["batsman_run"] <100)]["batsman_run"].count()
-            st.markdown("##### :green[Total 50s]")
-            st.header(hun_50)
-
-        col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
-
-        with col1:
-            season = df2["Season"].nunique()
-            st.markdown("##### :green[Seasons]")
-            st.header(season)
-        with col2:
-            st.markdown("<div style='border-left: 2px solid #FFF; height: 100px;'></div>", unsafe_allow_html=True)
-
-        with col3:
-            b_run = df1[df1["batsman_run"] >= 1]
-            top_10_bats = b_run.groupby("batter")["batsman_run"].sum().sum()
-            st.markdown("##### :green[Runs]")
-            st.header(top_10_bats)
-        with col4:
-            st.markdown("<div style='border-left: 2px solid #FFF; height: 100px;'></div>", unsafe_allow_html=True)
-
-        with col5:
-            total_balls = df1.shape[0]
-            st.markdown("##### :green[Balls]")
-            st.header(total_balls)
-        with col6:
-            st.markdown("<div style='border-left: 2px solid #FFF; height: 100px;'></div>", unsafe_allow_html=True)
-
-        with col7:
-            total_wick = df1[df1["isWicketDelivery"] == 1]["bowler"].value_counts().sum()
-            st.markdown("##### :green[Wickets]")
-            st.header(total_wick)
+    
 
 
-        st.markdown("****")
+    #     col1, col2, col3, col4, col5, col6, col = st.columns(7)
+
+        # with col1:
+        #     season = df2["Season"].nunique()
+        #     st.markdown("##### :green[Seasons]")
+        #     st.header(season)
+        # with col2:
+        #     st.markdown("<div style='border-left: 2px solid #FFF; height: 100px;'></div>", unsafe_allow_html=True)
+
+        # with col3:
+        #     b_run = df1[df1["batsman_run"] >= 1]
+        #     top_10_bats = b_run.groupby("batter")["batsman_run"].sum().sum()
+        #     st.markdown("##### :green[Runs]")
+        #     st.header(top_10_bats)
+        # with col4:
+        #     st.markdown("<div style='border-left: 2px solid #FFF; height: 100px;'></div>", unsafe_allow_html=True)
+
+        # with col5:
+        #     total_balls = df1.shape[0]
+        #     st.markdown("##### :green[Balls]")
+        #     st.header(total_balls)
+        # with col6:
+        #     st.markdown("<div style='border-left: 2px solid #FFF; height: 100px;'></div>", unsafe_allow_html=True)
+
+        # with col7:
+        #     total_wick = df1[df1["isWicketDelivery"] == 1]["bowler"].value_counts().sum()
+        #     st.markdown("##### :green[Wickets]")
+        #     st.header(total_wick)
+
+
+        # st.markdown("****")
     
         most_3 = functions.most_threes(df1)
         fig = px.scatter(most_3, x = "batter", y='count', size="count", size_max=60, color=most_3["count"])
@@ -772,7 +745,7 @@ if user_menu == "miscellaneous analysis":
                 x=most_3['batter'][i],
                 y=value,
                 text=str(value), showarrow=False, bgcolor="black")
-        fig.update_layout(title = "Most 3s by a Batsman 2008-2022",title_x=0.4,title_y=1, width=900, height=400)
+        fig.update_layout(title = "Most 3s by a Batsman 2008-2025",title_x=0.4,title_y=1, width=900, height=400)
         fig.update_traces(marker_color = "red", marker_line_color = 'black',marker_line_width = 2, opacity = 1)
         st.plotly_chart(fig)
 
@@ -781,7 +754,7 @@ if user_menu == "miscellaneous analysis":
         dots = functions.dot_balls(df1)
         fig = px.funnel(dots, y ="batter", x = "count")
         fig.update_xaxes(tickangle=45)
-        fig.update_layout(title = "Most dot balls by a batsman 2008-2022",title_x=0.4,title_y=1, width=900, height=450)
+        fig.update_layout(title = "Most dot balls by a batsman 2008-2025",title_x=0.4,title_y=1, width=900, height=450)
         fig.update_traces(marker_color = "#2E8B57", marker_line_color = 'black',marker_line_width = 2, opacity = 1)
         st.plotly_chart(fig)
 
@@ -798,18 +771,18 @@ if user_menu == "miscellaneous analysis":
         st.pyplot(fig)
         st.markdown("****")
 
-        merd_df = pd.merge(df1, df2, how='inner', on='ID')
-        total_10_scores = merd_df.groupby(["ID", "batter"])["batsman_run"].sum().reset_index()
-        high_score = total_10_scores[["batter", "batsman_run"]]
-        high_score = high_score.sort_values("batsman_run", ascending=False).reset_index().head(10)
-        fig = px.scatter(high_score, x = "batter", y = "batsman_run", color="batter",size = "batsman_run", size_max=60)
-        for i, value in enumerate(high_score['batsman_run']):
-            fig.add_annotation(
-                x=high_score['batter'][i],
-                y=value,
-                text=str(value), showarrow=False, bgcolor="black")
-        fig.update_layout(title = "Top 10 Highest scorers in IPL",title_x=0.3,title_y=0.95, width=1000, height=500)
-        st.plotly_chart(fig)
+        # merd_df = pd.merge(df1, df2, how='inner', on='ID')
+        # total_10_scores = merd_df.groupby(["ID", "batter"])["batsman_run"].sum().reset_index()
+        # high_score = total_10_scores[["batter", "batsman_run"]]
+        # high_score = high_score.sort_values("batsman_run", ascending=False).reset_index().head(10)
+        # fig = px.scatter(high_score, x = "batter", y = "batsman_run", color="batter",size = "batsman_run", size_max=60)
+        # for i, value in enumerate(high_score['batsman_run']):
+        #     fig.add_annotation(
+        #         x=high_score['batter'][i],
+        #         y=value,
+        #         text=str(value), showarrow=False, bgcolor="black")
+        # fig.update_layout(title = "Top 10 Highest scorers in IPL",title_x=0.3,title_y=0.95, width=1000, height=500)
+        # st.plotly_chart(fig)
 
         
 
@@ -885,13 +858,13 @@ if user_menu == "miscellaneous analysis":
 
         st.markdown("****")
 
-        extras = df1[["extra_type", "BattingTeam"]].value_counts().reset_index()
-        fig = px.scatter(extras, x = "BattingTeam", y = "count", color="extra_type", symbol="extra_type", size_max=50)
-        fig.update_layout(title = "Distribution of Extras by teams",title_x=0.3,title_y=0.95, width=1000, height=600)
-        fig.update_traces(marker_line_color = 'black',marker_line_width = 2, opacity = 1, marker_size=15)
-        st.plotly_chart(fig)
+        # extras = df1[["extra_type", "BattingTeam"]].value_counts().reset_index()
+        # fig = px.scatter(extras, x = "BattingTeam", y = "count", color="extra_type", symbol="extra_type", size_max=50)
+        # fig.update_layout(title = "Distribution of Extras by teams",title_x=0.3,title_y=0.95, width=1000, height=600)
+        # fig.update_traces(marker_line_color = 'black',marker_line_width = 2, opacity = 1, marker_size=15)
+        # st.plotly_chart(fig)
 
-        st.markdown("****")
+        # st.markdown("****")
 
         batter_runs1 = df1[df1["batsman_run"] >= 1][["batter", "batsman_run"]].groupby("batter")["batsman_run"].sum()
         total_balls = df1["batter"].value_counts()
@@ -907,38 +880,38 @@ if user_menu == "miscellaneous analysis":
         st.pyplot(fig)
 
         st.markdown("****")
-        merd_df = pd.merge(df1, df2, how='inner', on='ID')
-        total_10_scores = merd_df.groupby(["ID", "batter"])["batsman_run"].sum().reset_index()
-        high_score = total_10_scores[["batter", "batsman_run"]]
-        high_score = high_score.sort_values("batsman_run", ascending=False).reset_index().head(10)
-        fig = px.scatter(high_score, x = "batter", y = "batsman_run", color="batter", size_max=50)
-        fig.update_layout(title = "Top 10 Highest scorers in IPL",title_x=0.3,title_y=0.95, width=1000, height=600)
-        fig.update_traces(marker_line_color = 'black',marker_line_width = 2, opacity = 1, marker_size=15)
-        st.plotly_chart(fig)
+        # merd_df = pd.merge(df1, df2, how='inner', on='ID')
+        # total_10_scores = merd_df.groupby(["ID", "batter"])["batsman_run"].sum().reset_index()
+        # high_score = total_10_scores[["batter", "batsman_run"]]
+        # high_score = high_score.sort_values("batsman_run", ascending=False).reset_index().head(10)
+        # fig = px.scatter(high_score, x = "batter", y = "batsman_run", color="batter", size_max=50)
+        # fig.update_layout(title = "Top 10 Highest scorers in IPL",title_x=0.3,title_y=0.95, width=1000, height=600)
+        # fig.update_traces(marker_line_color = 'black',marker_line_width = 2, opacity = 1, marker_size=15)
+        # st.plotly_chart(fig)
 
-    expander4 = st.expander("See Explanation")
-    with expander4:
-        st.write("""In the "Miscellaneous Analysis" section, we delve into various aspects of IPL 
-                 data through three tabs: Analysis 1, 2, and 3. Here, we explore intriguing insights 
-                 such as IPL's global impact, visualized through maps showcasing its influence beyond
-                   the country's borders. Additionally, we utilize heatmaps and donut charts to uncover
-                     patterns and trends within the IPL dataset, offering a comprehensive exploration of 
-                     diverse facets of cricket's premier T20 league.""")
-        message = """
-                * Most Matches as an IPL Umpire
-                * All Teams' Runs per over Using HeatMap
-                * Distribution of Extras By IPL Teams
-                * Simple Stats Dashboard
-                * Most 50s by a Batsman (2008–2022). 
-                * Most 4s by a Batsman
-                * 5 Wicket Bowlers
-                * Most 3s by a Batsman
-                * Most Dot balls by a Batsman
-                * Top 10 Highest Scorers in IPL
-                * All Teams Sixes per over
-                * Batsman runs vs Strike Rate
-                * All IPL cities where IPL Held using Map
-                """
-        lines = message.split("\n")
-        for i in lines:
-            st.write(i)
+    # expander4 = st.expander("See Explanation")
+    # with expander4:
+    #     st.write("""In the "Miscellaneous Analysis" section, we delve into various aspects of IPL 
+    #              data through three tabs: Analysis 1, 2, and 3. Here, we explore intriguing insights 
+    #              such as IPL's global impact, visualized through maps showcasing its influence beyond
+    #                the country's borders. Additionally, we utilize heatmaps and donut charts to uncover
+    #                  patterns and trends within the IPL dataset, offering a comprehensive exploration of 
+    #                  diverse facets of cricket's premier T20 league.""")
+    #     message = """
+    #             * Most Matches as an IPL Umpire
+    #             * All Teams' Runs per over Using HeatMap
+    #             * Distribution of Extras By IPL Teams
+    #             * Simple Stats Dashboard
+    #             * Most 50s by a Batsman (2008–2022). 
+    #             * Most 4s by a Batsman
+    #             * 5 Wicket Bowlers
+    #             * Most 3s by a Batsman
+    #             * Most Dot balls by a Batsman
+    #             * Top 10 Highest Scorers in IPL
+    #             * All Teams Sixes per over
+    #             * Batsman runs vs Strike Rate
+    #             * All IPL cities where IPL Held using Map
+    #             """
+    #     lines = message.split("\n")
+    #     for i in lines:
+    #         st.write(i)
